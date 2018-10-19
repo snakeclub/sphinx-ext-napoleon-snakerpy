@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-    sphinx.ext.napoleon
+    sphinx.ext.napoleon_snakerpy
     ~~~~~~~~~~~~~~~~~~~
 
-    Support for NumPy and Google style docstrings.
+    Support for NumPy and Google style and SnakerPy docstrings.
 
     :copyright: Copyright 2007-2018 by the Sphinx team, see AUTHORS.
     :license: BSD, see LICENSE for details.
@@ -15,7 +15,7 @@ from six import PY2, iteritems
 
 import sphinx
 from sphinx.application import Sphinx
-from sphinx.ext.napoleon.docstring import GoogleDocstring, NumpyDocstring
+from sphinx.ext.napoleon_snakerpy.docstring import GoogleDocstring, NumpyDocstring, SnakerPyDocstring
 
 if False:
     # For type annotation
@@ -32,11 +32,12 @@ class Config(object):
         # conf.py
 
         # Add any Sphinx extension module names here, as strings
-        extensions = ['sphinx.ext.napoleon']
+        extensions = ['sphinx.ext.napoleon_snakerpy']
 
         # Napoleon settings
         napoleon_google_docstring = True
         napoleon_numpy_docstring = True
+        napoleon_snakerpy_docstring = True
         napoleon_include_init_with_doc = False
         napoleon_include_private_with_doc = False
         napoleon_include_special_with_doc = False
@@ -53,6 +54,8 @@ class Config(object):
        https://google.github.io/styleguide/pyguide.html
     .. _NumPy style:
        https://github.com/numpy/numpy/blob/master/doc/HOWTO_DOCUMENT.rst.txt
+    .. _SnakerPy style:
+       https://github.com/snakeclub/DevStandards/blob/master/docs/python/Python代码规范.md
 
     Attributes
     ----------
@@ -259,6 +262,7 @@ class Config(object):
     _config_values = {
         'napoleon_google_docstring': (True, 'env'),
         'napoleon_numpy_docstring': (True, 'env'),
+        'napoleon_snakerpy_docstring': (True, 'env'),
         'napoleon_include_init_with_doc': (False, 'env'),
         'napoleon_include_private_with_doc': (False, 'env'),
         'napoleon_include_special_with_doc': (False, 'env'),
@@ -350,6 +354,7 @@ def _process_docstring(app, what, name, obj, options, lines):
 
     * ``napoleon_google_docstring`` -- parse Google style docstrings
     * ``napoleon_numpy_docstring`` -- parse NumPy style docstrings
+    * ``napoleon_snakerpy_docstring`` -- parse SnakerPy style docstrings
 
     Parameters
     ----------
@@ -376,6 +381,10 @@ def _process_docstring(app, what, name, obj, options, lines):
     """
     result_lines = lines
     docstring = None  # type: GoogleDocstring
+    if app.config.napoleon_snakerpy_docstring:
+        docstring = SnakerPyDocstring(result_lines, app.config, app, what, name,
+                                   obj, options)
+        result_lines = docstring.lines()
     if app.config.napoleon_numpy_docstring:
         docstring = NumpyDocstring(result_lines, app.config, app, what, name,
                                    obj, options)
